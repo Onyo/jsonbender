@@ -58,6 +58,37 @@ class OptionalS(S):
             return ret
 
 
+class ListS(S):
+    """
+    Greedily selects a path from a list of possible keys.
+    Example:
+        S(['a', 0], ['c']).execute({'a': [{'b': 42}]}, 'c': 0) -> {'b': 42}
+        S(['b', 0], ['c']).execute({'a': [{'b': 42}]}, 'c': 0) -> 0
+    """
+
+    def execute(self, source):
+        original_source = source
+        for path in self._path:
+            for key in path:
+                try:
+                    source = source[key]
+                except (KeyError, IndexError, TypeError):
+                    source = original_source
+                    break
+            else:
+                return source
+
+        # If self.default exists, this is an optional selector
+        if hasattr(self, 'default'):
+            return self.default
+
+        raise TypeError(self._path)
+
+    def optional(self, default=None):
+        self.default = default
+        return self
+
+
 class F(Bender):
     """
     Lifts a python callable into a Bender, so it can be composed.
