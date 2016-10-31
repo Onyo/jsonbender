@@ -2,7 +2,8 @@ from functools import reduce
 from itertools import chain
 from warnings import warn
 
-from jsonbender.core import Bender, bend, Transport
+from jsonbender.core import Bender, bend, Transport, Compose
+from jsonbender.selectors import K, F
 
 
 class ListOp(Bender):
@@ -72,6 +73,47 @@ class Forall(ListOp):
 
         """
         return ForallBend(mapping, context)
+
+    @staticmethod
+    def optional(v, default):
+        if isinstance(v, Compose):
+            # If Compose try to set arguments as optional
+            v._first = Forall.optional(v._first, default)
+            v._second = Forall.optional(v._second, default)
+        elif isinstance(v, K):
+            # Ks don't need optional
+            pass
+        elif isinstance(v, Forall):
+            pass
+        elif isinstance(v, ListOp):
+            pass
+        elif isinstance(v, F):
+            # Protect function against optionals
+            v = v.protect(default)
+        elif isinstance(v, list):
+            # Set all items of the list as optional
+            for item in v:
+                Forall.optional(item, default)
+        elif isinstance(v, dict):
+            # Set all values of the dictionary as optional
+            for item in v.values():
+                Forall.optional(item, default)
+        elif hasattr(v, 'optional'):
+            # Optional method exists, just set the default value
+            v = v.optional(default)
+
+        return v
+
+    @classmethod
+    def bend_optional(cls, mapping, default=None, context=None):
+        """
+        Similar to bend. However, if marks all elements within the list
+        to optional with the `default` value.
+        Does not propagate to nested Forall's or ListOp's
+        """
+        for k, v in mapping.items():
+            mapping[k] = cls.optional(v, default)
+        return cls.bend(mapping, context)
 
 
 class ForallBend(Forall):
