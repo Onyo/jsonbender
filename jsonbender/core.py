@@ -30,6 +30,9 @@ class Bender(object):
     def __eq__(self, other):
         return Eq(self, other)
 
+    def __ne__(self, other):
+        return Neq(self, other)
+
     def __and__(self, other):
         return And(self, other)
 
@@ -172,6 +175,11 @@ class Eq(BinaryOperator):
         return v1 == v2
 
 
+class Neq(BinaryOperator):
+    def op(self, v1, v2):
+        return v1 != v2
+
+
 class And(BinaryOperator):
     def op(self, v1, v2):
         return v1 and v2
@@ -238,4 +246,3 @@ def _bend(mapping, transport):
 
     else:
         return mapping
-
