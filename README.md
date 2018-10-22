@@ -66,6 +66,23 @@ print(json.dumps(result))
 `K()` is a selector for constant values:
 It takes any value as a parameter and always returns that value regardless of the input.
 
+Besides the constant value, `K()` selector also takes an optional `copy` argument. That argument aims to address a common python problem that occurs when iterables treated as default arguments.
+
+```python
+fruits = []
+k = K(fruits)
+fruits.append('apple')
+
+k.execute('sample')  # Returns ['apple']
+
+
+fruits = []
+k = K(fruits, copy=True)
+fruits.append('apple')
+
+k.execute('sample')  # Returns []
+```
+
 
 ##### S
 
