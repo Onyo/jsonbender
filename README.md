@@ -1,6 +1,8 @@
 About
 ---
 
+[![Build Status](https://travis-ci.com/Onyo/jsonbender.svg?branch=develop)](https://travis-ci.com/Onyo/jsonbender)
+
 JSONBender is an embedded Python [DSL](https://en.wikipedia.org/wiki/Domain-specific_language) for transforming dicts.
 It's name is inspired by Nickelodeon's cartoon series [Avatar: The Last Airbender](https://en.wikipedia.org/wiki/Avatar:_The_Last_Airbender).
 
