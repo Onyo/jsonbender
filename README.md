@@ -156,6 +156,38 @@ MAPPING_2 = {'sqrt': S('val') >> F(math.sqrt).protect(-1)}
 assert bend(MAPPING_2, {'val': -1}) == {'sqrt': -1}
 ```
 
+You can pass arguments to the function from the mapping as well. However, notice the order in which arguments are received inside the function during bending time:
+```python
+from jsonbender import bend, F
+
+def foo(x, y, z):
+    return x, y, z
+
+MAPPING_1 = {'keys': F(foo, 'A', 'B')}
+assert bend(MAPPING_1, 'C') == {'keys': ('C', 'A', 'B')}
+```
+
+As seen above, the arguments passed during bending process appear prior to those passed during creating the mapping.
+Let's see what happens while passing `args` and `kwargs` along with positional arguments:
+```python
+from jsonbender import bend, F
+
+def foo(x, y, *args, **kwargs):
+    return x, y, args, kwargs
+
+MAPPING_1 = {'keys': F(foo, 'A', 'B')}
+assert bend(MAPPING_1, 'C') == {'keys': ( 'C', 'A', ('B', ), {} )}
+
+MAPPING_2 = {'keys': F(foo, 'A', 'B')}
+assert bend(MAPPING_2, {'c': 'C'}) == {'keys': ( {'c': 'C'}, 'A', ('B', ), {} )}
+
+MAPPING_3 = {'keys': F(foo, 'A', 'B', {'d': 'D'})}
+assert bend(MAPPING_3, {'c': 'C'}) == {'keys': ( {'c': 'C'}, 'A', ('B', {'d': 'D'}), {} )}
+
+MAPPING_4 = {'keys': F(foo, 'A', 'B', **{'d': 'D'})}
+assert bend(MAPPING_4, {'c': 'C'}) == {'keys': ( {'c': 'C'}, 'A', ('B', ), {'d': 'D'} )}
+```
+
 
 #### Operators
 
