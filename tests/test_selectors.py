@@ -1,6 +1,7 @@
 import unittest
 
-from jsonbender.selectors import F, ProtectedF, K, S, OptionalS
+from jsonbender.core import K
+from jsonbender.selectors import F, ProtectedF, S, OptionalS
 from jsonbender.test import BenderTestMixin
 
 

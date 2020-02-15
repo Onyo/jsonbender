@@ -1,16 +1,6 @@
 from jsonbender.core import Bender
 
 
-class K(Bender):
-    """
-    Selects a constant value.
-    """
-    def __init__(self, value):
-        self._val = value
-
-    def execute(self, source):
-        return self._val
-
 
 class S(Bender):
     """

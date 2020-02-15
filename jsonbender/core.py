@@ -73,6 +73,47 @@ class Bender(object):
         return self >> GetItem(index)
 
 
+class K(Bender):
+    """
+    Selects a constant value.
+    """
+    def __init__(self, value):
+        self._val = value
+
+    def execute(self, source):
+        return self._val
+
+
+class List(Bender):
+    """Bender wrapper for lists."""
+
+    def __init__(self, list_):
+        self.list = [benderify(v) for v in list_]
+
+    def raw_execute(self, source):
+        source = Transport.from_source(source)
+        res = [v.raw_execute(source).value for v in self.list]
+        return Transport(res, source.context)
+
+
+class Dict(Bender):
+    """Bender wrapper for dicts."""
+
+    def __init__(self, dict_):
+        self.dict = {k: benderify(v) for k, v in iteritems(dict_)}
+
+    def raw_execute(self, source):
+        source = Transport.from_source(source)
+        res = {}
+        for k, v in iteritems(self.dict):
+            try:
+                res[k] = v.raw_execute(source).value
+            except Exception as e:
+                m = 'Error for key {}: {}'.format(k, str(e))
+                raise BendingException(m)
+        return Transport(res, source.context)
+
+
 class GetItem(Bender):
     def __init__(self, index):
         self._index = index
@@ -83,8 +124,8 @@ class GetItem(Bender):
 
 class Compose(Bender):
     def __init__(self, first, second):
-        self._first = first
-        self._second = second
+        self._first = benderify(first)
+        self._second = benderify(second)
 
     def raw_execute(self, source):
         return self._second.raw_execute(self._first.raw_execute(source))
@@ -103,7 +144,7 @@ class UnaryOperator(Bender):
     """
 
     def __init__(self, bender):
-        self.bender = bender
+        self.bender = benderify(bender)
 
     def op(self, v):
         raise NotImplementedError()
@@ -137,8 +178,8 @@ class BinaryOperator(Bender):
     """
 
     def __init__(self, bender1, bender2):
-        self._bender1 = bender1
-        self._bender2 = bender2
+        self._bender1 = benderify(bender1)
+        self._bender2 = benderify(bender2)
 
     def op(self, v1, v2):
         raise NotImplementedError()
@@ -213,6 +254,20 @@ class Transport(object):
             return cls(source, {})
 
 
+def benderify(mapping):
+    """Recursively turn all values in a data-structure into bender objects."""
+    if isinstance(mapping, list):
+        return List(mapping)
+
+    elif isinstance(mapping, dict):
+        return Dict(mapping)
+
+    elif isinstance(mapping, Bender):
+        return mapping
+
+    return K(mapping)
+
+
 def bend(mapping, source, context=None):
     """
     The main bending function.
@@ -224,26 +279,5 @@ def bend(mapping, source, context=None):
     """
     context = {} if context is None else context
     transport = Transport(source, context)
-    return _bend(mapping, transport)
-
-
-def _bend(mapping, transport):
-    if isinstance(mapping, list):
-        return [_bend(v, transport) for v in mapping]
-
-    elif isinstance(mapping, dict):
-        res = {}
-        for k, v in iteritems(mapping):
-            try:
-                res[k] = _bend(v, transport)
-            except Exception as e:
-                m = 'Error for key {}: {}'.format(k, str(e))
-                raise BendingException(m)
-        return res
-
-    elif isinstance(mapping, Bender):
-        return mapping(transport)
-
-    else:
-        return mapping
+    return benderify(mapping)(transport)
 

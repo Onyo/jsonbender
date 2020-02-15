@@ -2,7 +2,8 @@ import unittest
 
 import sys
 
-from jsonbender import S, K
+from jsonbender import S, K, F
+from jsonbender._compat import iteritems
 from jsonbender.core import bend, BendingException, Context
 from jsonbender.test import BenderTestMixin
 
@@ -146,6 +147,20 @@ class TestGetItem(unittest.TestCase, BenderTestMixin):
         else:
             val = list(range(10))
         self.assert_bender(bender, {'val': val}, [2, 4, 6])
+
+
+class TestDict(unittest.TestCase, BenderTestMixin):
+    def test_function_with_dict(self):
+        filter_none = F(lambda d: {k: v for k, v in iteritems(d) if v is not None})
+        b = filter_none << {'a': K(1), 'b': K(None), 'c': False}
+        self.assert_bender(b, {}, {'a': 1, 'c': False})
+
+
+class TestList(unittest.TestCase, BenderTestMixin):
+    def test_function_with_list(self):
+        filter_none = F(lambda l: [v for v in l if v is not None])
+        b = filter_none << [1, None, False]
+        self.assert_bender(b, {}, [1, False])
 
 
 if __name__ == '__main__':

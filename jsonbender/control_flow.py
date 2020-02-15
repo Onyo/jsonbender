@@ -1,5 +1,4 @@
-from jsonbender.core import Bender
-from jsonbender.selectors import K
+from jsonbender.core import Bender, K
 
 
 class If(Bender):
