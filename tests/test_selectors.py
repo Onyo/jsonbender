@@ -1,6 +1,8 @@
 import unittest
 
-from jsonbender.selectors import F, ProtectedF, K, S, OptionalS
+from jsonbender import bend
+from jsonbender.list_ops import ForallBend
+from jsonbender.selectors import F, ProtectedF, K, S, OptionalS, Element, P, OptionalP
 from jsonbender.test import BenderTestMixin
 
 
@@ -88,6 +90,78 @@ class TestProtectedF(unittest.TestCase, FTestsMixin):
         protected = ProtectedF(int)
         self.assert_bender(protected, '123', 123)
         self.assert_bender(protected, None, None)
+
+
+
+class TestElement(unittest.TestCase, BenderTestMixin):
+    selector_cls = Element
+
+    def test_element_returns_itself_string(self):
+        self.assert_bender(Element(), 'test', 'test')
+
+    def test_element_returns_itself_int(self):
+        self.assert_bender(Element(), 1, 1)
+
+    def test_element_returns_itself_list(self):
+        self.assert_bender(Element(), ['test'], ['test'])
+
+    def test_element_returns_itself_dict(self):
+        self.assert_bender(Element(), {'test': 1}, {'test': 1})
+
+    def test_element_nested(self):
+        mapping = {'servers': S('addresses') >> ForallBend(
+            {'address': Element()})}
+        result = bend(mapping, {'addresses': ['192.168.1.0', '192.168.1.1']})
+        expected = {'servers': [{'address': '192.168.1.0'}, {'address': '192.168.1.1'}]}
+        assert result == expected
+
+
+class TestObject(object):
+
+    def __init__(self, **kwargs):
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+
+
+class PTestsMixin(BenderTestMixin):
+    def test_no_selector_raises_value_error(self):
+        self.assertRaises(ValueError, self.selector_cls)
+
+    def test_shallow_existing_field(self):
+        source = TestObject(**{'a': 'val'})
+        self.assert_bender(self.selector_cls('a'), source, 'val')
+
+    def test_deep_existing_path(self):
+        test_object = TestObject(**{'b': 'ok!'})
+        source = TestObject(**{'a': test_object})
+        self.assert_bender(self.selector_cls('a', 'b'), source, 'ok!')
+
+
+class TestP(unittest.TestCase, PTestsMixin):
+    selector_cls = P
+
+    def test_shallow_missing_field(self):
+        self.assertRaises(AttributeError, self.selector_cls('k'), TestObject())
+
+    def test_deep_missing_field(self):
+        test_object = TestObject(**{'b': 'ok!'})
+        source = TestObject(**{'a': test_object})
+        self.assertRaises(AttributeError, self.selector_cls('a', 'k2'), source)
+
+
+class TestOptionalP(unittest.TestCase, PTestsMixin):
+    selector_cls = OptionalP
+
+    def test_opts_without_default(self):
+        bender = self.selector_cls('key', 'missing')
+        self.assert_bender(bender, TestObject(**{'key': TestObject()}), None)
+        self.assert_bender(bender, TestObject(), None)
+
+    def test_opts_with_default(self):
+        default = 27
+        bender = self.selector_cls('key', 'missing', default=default)
+        self.assert_bender(bender, TestObject(**{'key': TestObject()}), default)
+        self.assert_bender(bender, TestObject(), default)
 
 
 if __name__ == '__main__':
