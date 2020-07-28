@@ -1,7 +1,7 @@
 from jsonbender.core import Bender, Context, bend, BendingException
 from jsonbender.list_ops import FlatForall, Forall, Filter, Reduce
 from jsonbender.string_ops import Format
-from jsonbender.selectors import F, K, S, OptionalS
+from jsonbender.selectors import F, K, S, OptionalS, P, OptionalP, Element
 from jsonbender.control_flow import Alternation, If, Switch
 
 
