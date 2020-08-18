@@ -2,7 +2,7 @@ import unittest
 
 from jsonbender import bend
 from jsonbender.list_ops import ForallBend
-from jsonbender.selectors import F, ProtectedF, K, S, OptionalS, Element, P, OptionalP
+from jsonbender.selectors import F, ProtectedF, K, S, OptionalS, Element, P, OptionalP, First, Second
 from jsonbender.test import BenderTestMixin
 
 
@@ -114,6 +114,22 @@ class TestElement(unittest.TestCase, BenderTestMixin):
         result = bend(mapping, {'addresses': ['192.168.1.0', '192.168.1.1']})
         expected = {'servers': [{'address': '192.168.1.0'}, {'address': '192.168.1.1'}]}
         assert result == expected
+
+
+class TestFirst(unittest.TestCase, BenderTestMixin):
+    def test_element_returns_first_element_of_tuple(self):
+        self.assert_bender(First(), ('first', 'second'), 'first')
+
+    def test_not_tuple(self):
+        self.assertRaises(IndexError, First(), ())
+
+
+class TestSecond(unittest.TestCase, BenderTestMixin):
+    def test_element_returns_second_element_of_tuple(self):
+        self.assert_bender(Second(), ('first', 'second'), 'second')
+
+    def test_not_tuple(self):
+        self.assertRaises(IndexError, Second(), ('a'))
 
 
 class TestObject(object):

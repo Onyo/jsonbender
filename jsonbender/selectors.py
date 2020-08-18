@@ -171,3 +171,29 @@ class Element(Bender):
 
     def execute(self, source):
         return source
+
+
+class First(Bender):
+    """
+    Selects the first element of a tuple. This is a shortcut for F(lambda x: x[0])
+    Can be especially helpful in combination with ForallDict
+
+    Example:
+        First().execute(('a', 'b')) -> 'a'
+    """
+
+    def execute(self, source):
+        return source[0]
+
+
+class Second(Bender):
+    """
+    Selects the second element of a tuple. This is a shortcut for F(lambda x: x[1])
+    Can be especially helpful in combination with ForallDict
+
+    Example:
+        Second().execute(('a', 'b')) -> 'b'
+    """
+
+    def execute(self, source):
+        return source[1]
