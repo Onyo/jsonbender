@@ -116,3 +116,84 @@ class ProtectedF(F):
             return super(ProtectedF, self).execute(value)
 
 
+
+class P(Bender):
+    """
+    Selects a path of keys based on properties.
+    Example:
+        S('a', 'b').execute(input_object) -> input_object.a.b
+    """
+
+    def __init__(self, *path, **kwargs):
+        super(P, self).__init__(*path, **kwargs)
+        if not path:
+            raise ValueError('No path given')
+        self._path = path
+
+    def execute(self, source):
+        for key in self._path:
+            source = getattr(source, key)
+        return source
+
+    def optional(self, default=None):
+        """
+        Return an OptionalS with the same path and with the given `default`.
+        """
+        return OptionalP(*self._path, default=default)
+
+
+class OptionalP(P):
+    """
+    Similar to P. However, if any of the keys doesn't exist, returns the
+    `default` value.
+
+    `default` defaults to None.
+    Example:
+        OptionalP('a', 'not_existing', default=23).execute(input_object) -> 23
+    """
+
+    def __init__(self, *path, **kwargs):
+        self.default = kwargs.get('default')
+        super(OptionalP, self).__init__(*path)
+
+    def execute(self, source):
+        for key in self._path:
+            source = getattr(source, key, self.default)
+        return source
+
+
+class Element(Bender):
+    """
+    Selects the element itself.
+    Example:
+        Element().execute(input_object) -> input_object
+    """
+
+    def execute(self, source):
+        return source
+
+
+class First(Bender):
+    """
+    Selects the first element of a tuple. This is a shortcut for F(lambda x: x[0])
+    Can be especially helpful in combination with ForallDict
+
+    Example:
+        First().execute(('a', 'b')) -> 'a'
+    """
+
+    def execute(self, source):
+        return source[0]
+
+
+class Second(Bender):
+    """
+    Selects the second element of a tuple. This is a shortcut for F(lambda x: x[1])
+    Can be especially helpful in combination with ForallDict
+
+    Example:
+        Second().execute(('a', 'b')) -> 'b'
+    """
+
+    def execute(self, source):
+        return source[1]
