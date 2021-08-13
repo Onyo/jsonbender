@@ -37,11 +37,11 @@ class OptionalS(S):
 
     def __init__(self, *path, **kwargs):
         self.default = kwargs.get("default")
-        super(OptionalS, self).__init__(*path)
+        super().__init__(*path)
 
     def bend(self, source):
         try:
-            ret = super(OptionalS, self).bend(source)
+            ret = super().bend(source)
         except LookupError:
             return self.default
         else:
@@ -96,10 +96,9 @@ class ProtectedF(F):
 
     def __init__(self, func, *args, **kwargs):
         self._protect_against = kwargs.pop("protect_against", None)
-        super(ProtectedF, self).__init__(func, *args, **kwargs)
+        super().__init__(func, *args, **kwargs)
 
     def bend(self, value):
         if value == self._protect_against:
             return value
-        else:
-            return super(ProtectedF, self).bend(value)
+        return super().bend(value)

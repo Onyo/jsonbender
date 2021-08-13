@@ -65,7 +65,8 @@ class ForallBend(Forall):
     mapping: a JSONBender mapping as passed to the `bend()` function.
     """
 
-    def __init__(self, mapping, context=None):
+    def __init__(self, mapping):
+        super().__init__(None)
         self._mapping = mapping
         # TODO this is here for retrocompatibility reasons.
         # remove this when ListOp also breaks retrocompatibility
@@ -96,7 +97,7 @@ class Reduce(ListOp):
         try:
             return reduce(func, vals)
         except TypeError as e:  # empty list with no initial value
-            raise ValueError(e.args[0])
+            raise ValueError(e.args[0]) from e
 
 
 class Filter(ListOp):

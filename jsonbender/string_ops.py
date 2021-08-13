@@ -51,4 +51,4 @@ class ProtectedFormat(Format):
             # create an object with property value=None so it can be processed
             return None
         # else just behave normally
-        return super(ProtectedFormat, self).bend(source)
+        return super().bend(source)
