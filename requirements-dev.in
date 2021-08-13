@@ -1,0 +1,10 @@
+-r requirements.in
+black
+isort
+pip-tools
+pre-commit
+pydocstyle
+pylint
+pytest
+pytest-cov
+safety

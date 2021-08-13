@@ -1,7 +1,7 @@
 About
 ---
 
-[![Build Status](https://travis-ci.com/moreonion/jsonbender.svg?branch=develop)](https://travis-ci.com/moreonion/jsonbender) [![codecov](https://codecov.io/gh/moreonion/jsonbender/branch/develop/graph/badge.svg)](https://codecov.io/gh/moreonion/jsonbender)
+![Build Status](![example workflow](https://github.com/moreonion/jsonbender/actions/workflows/pytest.yaml/badge.svg)] [![codecov](https://codecov.io/gh/moreonion/jsonbender/branch/main/graph/badge.svg)](https://codecov.io/gh/moreonion/jsonbender)
 
 JSONBender is an embedded Python [DSL](https://en.wikipedia.org/wiki/Domain-specific_language) for transforming dicts.
 It's name is inspired by Nickelodeon's cartoon series [Avatar: The Last Airbender](https://en.wikipedia.org/wiki/Avatar:_The_Last_Airbender).
@@ -188,7 +188,7 @@ The bitwise operators are not yet implemented, except for the lshift (`<<`) and 
 See "Composition" below.
 
 
-#### List ops 
+#### List ops
 
 There are 4 benders for working with lists, inspired by the common functional programming operations.
 
@@ -428,4 +428,3 @@ ret = bend(MAPPING, {
 })
 assert ret == {'name': 'Mary', 'age': 26}
 ```
-

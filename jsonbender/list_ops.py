@@ -12,6 +12,7 @@ class ListOp(Bender):
     to the operator's __init__(), an iterable, and should return the
     desired result.
     """
+
     def __init__(self, *args):
         if len(args) == 1:
             self._func = args[0]
@@ -19,14 +20,16 @@ class ListOp(Bender):
         # TODO: this is here for compatibility reasons.
         elif len(args) == 2:
             self._bender, self._func = args
-            msg = ('Passing a bender to {0} is deprecated.'
-                   'Please use {0} in a composition chain '
-                   '(see docs for more details).'
-                   .format(type(self).__name__))
+            msg = (
+                "Passing a bender to {0} is deprecated."
+                "Please use {0} in a composition chain "
+                "(see docs for more details).".format(type(self).__name__)
+            )
             warn(DeprecationWarning(msg))
         else:
-            msg = ('{} constructor only takes one parameter, {} given'
-                   .format(type(self).__name__, len(args)))
+            msg = "{} constructor only takes one parameter, {} given".format(
+                type(self).__name__, len(args)
+            )
             raise TypeError(msg)
 
     def op(self, func, vals):
@@ -62,7 +65,8 @@ class ForallBend(Forall):
     mapping: a JSONBender mapping as passed to the `bend()` function.
     """
 
-    def __init__(self, mapping, context=None):
+    def __init__(self, mapping):
+        super().__init__(None)
         self._mapping = mapping
         # TODO this is here for retrocompatibility reasons.
         # remove this when ListOp also breaks retrocompatibility
@@ -88,11 +92,12 @@ class Reduce(ListOp):
     Reduce(lambda acc, i: acc + i).bend([1, 4, 6])  # -> 11
     ```
     """
+
     def op(self, func, vals):
         try:
             return reduce(func, vals)
         except TypeError as e:  # empty list with no initial value
-            raise ValueError(e.args[0])
+            raise ValueError(e.args[0]) from e
 
 
 class Filter(ListOp):
@@ -124,5 +129,6 @@ class FlatForall(ListOp):
          [0, 1, 9, 11, 99, 101]
     ```
     """
+
     def op(self, func, vals):
         return list(chain.from_iterable(map(func, vals)))

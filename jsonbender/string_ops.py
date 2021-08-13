@@ -16,6 +16,7 @@ class Format(Bender):
     fmt.bend(source)  # -> 'Edsger W. Dijkstra'
     ```
     """
+
     def __init__(self, format_string, *args, **kwargs):
         self._format_str = format_string
         self._positional_benders = args
@@ -23,8 +24,7 @@ class Format(Bender):
 
     def bend(self, source):
         args = [bender.bend(source) for bender in self._positional_benders]
-        kwargs = {k: bender.bend(source)
-                  for k, bender in self._named_benders.items()}
+        kwargs = {k: bender.bend(source) for k, bender in self._named_benders.items()}
         return self._format_str.format(*args, **kwargs)
 
 
@@ -41,13 +41,14 @@ class ProtectedFormat(Format):
         source = {'first': 'Edsger'}
         fmt.bend(source)  # -> None
     """
+
     def bend(self, source):
         # if any of the args to print are None, return None
         if any(
-            [bender.bend(source) is None for bender in self._positional_benders] +
-            [bender.bend(source) is None for bender in self._named_benders.values()]
+            [bender.bend(source) is None for bender in self._positional_benders]
+            + [bender.bend(source) is None for bender in self._named_benders.values()]
         ):
             # create an object with property value=None so it can be processed
             return None
         # else just behave normally
-        return super(ProtectedFormat, self).bend(source)
+        return super().bend(source)

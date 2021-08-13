@@ -1,4 +1,4 @@
-class Bender(object):
+class Bender:
 
     """
     Base bending class. All selectors and transformations should directly or
@@ -10,9 +10,6 @@ class Bender(object):
 
     Subclasses must implement __init__() and bend() methods.
     """
-
-    def __init__(self, *args, **kwargs):
-        pass
 
     def bend(self, source):
         raise NotImplementedError()
@@ -67,6 +64,7 @@ class K(Bender):
     """
     Selects a constant value.
     """
+
     def __init__(self, value):
         self._val = value
 
@@ -96,8 +94,8 @@ class Dict(Bender):
             try:
                 res[k] = v.bend(source)
             except Exception as e:
-                m = 'Error for key {}: {}'.format(k, str(e))
-                raise BendingException(m)
+                m = "Error for key {}: {}".format(k, str(e))
+                raise BendingException(m) from e
         return res
 
 
@@ -170,8 +168,7 @@ class BinaryOperator(Bender):
         raise NotImplementedError()
 
     def bend(self, source):
-        return self.op(self._bender1.bend(source),
-                       self._bender2.bend(source))
+        return self.op(self._bender1.bend(source), self._bender2.bend(source))
 
 
 class Add(BinaryOperator):
@@ -223,10 +220,10 @@ def benderify(mapping):
     if isinstance(mapping, list):
         return List(mapping)
 
-    elif isinstance(mapping, dict):
+    if isinstance(mapping, dict):
         return Dict(mapping)
 
-    elif isinstance(mapping, Bender):
+    if isinstance(mapping, Bender):
         return mapping
 
     return K(mapping)

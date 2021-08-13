@@ -2,8 +2,10 @@
 *.pyc
 __pycache__
 .cache
+.coverage
+.venv
 build
+coverage.xml
 dist/
 MANIFEST
 *.egg-info
-.tox
