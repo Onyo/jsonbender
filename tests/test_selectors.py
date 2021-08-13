@@ -1,6 +1,6 @@
 import pytest
 
-from jsonbender.core import K
+from jsonbender.core import K, Protected
 from jsonbender.selectors import F, OptionalS, ProtectedF, S
 
 
@@ -71,7 +71,7 @@ class FTestsMixin:
 
     def test_protect(self):
         protected = self.selector_cls(int).protect(protect_against="bad")
-        assert isinstance(protected, ProtectedF)
+        assert isinstance(protected, Protected)
         assert protected.bend("123") == 123
         assert protected.bend("bad") == "bad"
 
@@ -89,7 +89,10 @@ class TestF(FTestsMixin):
 
 
 class TestProtectedF(FTestsMixin):
-    selector_cls = ProtectedF
+    @staticmethod
+    def selector_cls(*args, **kwargs):
+        """Wrap OptionalS into a staticmethod so it’s turned into a bound method."""
+        return ProtectedF(*args, **kwargs)
 
     @staticmethod
     def test_protectedf():

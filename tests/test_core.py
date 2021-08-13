@@ -1,6 +1,6 @@
 import pytest
 
-from jsonbender import F, K, S
+from jsonbender import F, K, S, core
 from jsonbender.core import BendingException, bend
 
 
@@ -159,3 +159,26 @@ class TestList:
         filter_none = F(lambda l: [v for v in l if v is not None])
         b = filter_none << [1, None, False]
         assert b.bend({}) == [1, False]
+
+
+class ProtectedTest:
+    """Test the Protect-bender."""
+
+    @staticmethod
+    def test_protect_against_none():
+        """Test protection from the default value None."""
+        bender = core.Protected(S("key"))
+        assert bender.bend(None) is None
+        assert bender.bend({"key": "value"}) == "value"
+
+    @staticmethod
+    def test_protect_against_value():
+        """Test protection from a specific value."""
+        bender = core.Protected(F(lambda x: 1 / x), against=0)
+        assert bender.bend(0) == 0
+
+    @staticmethod
+    def test_benderify_arguments():
+        """Test that the nested bender accepts raw values."""
+        bender = core.Protected(1)
+        assert bender.bend({}) == 1

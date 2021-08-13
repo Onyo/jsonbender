@@ -59,6 +59,10 @@ class Bender:
     def __getitem__(self, index):
         return self >> GetItem(index)
 
+    def protect(self, protect_against=None):
+        """Return this bender wrapped into a Protect() bender."""
+        return Protected(self, protect_against)
+
 
 class K(Bender):
     """
@@ -114,6 +118,26 @@ class Compose(Bender):
 
     def bend(self, source):
         return self._second.bend(self._first.bend(source))
+
+
+class Protected(Bender):
+    """Wraps a bender to protect it from a specific value.
+
+    This bender gives the same result as the wrapped bender unless the specific
+    value it protects against is passed. Then it doesn’t invoke the wrapped
+    bender and returns the value unchanged instead.
+    """
+
+    def __init__(self, bender, against=None):
+        """Wrap a bender."""
+        self._bender = benderify(bender)
+        self._against = against
+
+    def bend(self, source):
+        """Return the bended value."""
+        if source == self._against:
+            return source
+        return self._bender.bend(source)
 
 
 class UnaryOperator(Bender):

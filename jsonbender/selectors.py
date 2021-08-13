@@ -1,4 +1,4 @@
-from jsonbender.core import Bender
+from jsonbender.core import Bender, Protected
 
 
 class S(Bender):
@@ -71,34 +71,8 @@ class F(Bender):
     def bend(self, source):
         return self._func(source, *self._args, **self._kwargs)
 
-    def protect(self, protect_against=None):
-        """
-        Return a ProtectedF with the same parameters and with the given
-        `protect_against`.
-        """
-        return ProtectedF(self._func, *self._args, protect_against=protect_against, **self._kwargs)
 
-
-class ProtectedF(F):
-    """
-    Similar to F.
-    However, if the passing value equals the `protect_against` parameter,
-    don't execute the function and return the passed value.
-
-    `protect_against` defaults to None.
-    Example:
-    ```
-        f = ProtectedF(lambda i: 1.0 / i, protect_against=0.0)
-        f.bend(0)  # -> 0
-    ```
-
-    """
-
-    def __init__(self, func, *args, **kwargs):
-        self._protect_against = kwargs.pop("protect_against", None)
-        super().__init__(func, *args, **kwargs)
-
-    def bend(self, source):
-        if source == self._protect_against:
-            return source
-        return super().bend(source)
+def ProtectedF(func, *args, **kwargs):
+    """Backwards compatibility for ProtectedF()."""
+    protect_against = kwargs.pop("protect_against", None)
+    return Protected(F(func, *args, **kwargs), protect_against)
