@@ -24,6 +24,12 @@ class TestIf:
         if_ = If(S("country") == K("China"), S("first_name"))
         assert if_.bend(self.guga) is None
 
+    @staticmethod
+    def test_unbenderified():
+        """Test the If-bender with raw arguments."""
+        assert If(True, "true", "false").bend({}) == "true"
+        assert If(False, "true", "false").bend({}) == "false"
+
 
 class TestAlternation:
     def test_empty_benders(self):
@@ -41,6 +47,12 @@ class TestAlternation:
             Alternation(S(1)).bend([])
         with pytest.raises(KeyError):
             Alternation(S(1)).bend({})
+
+    @staticmethod
+    def test_unbenderified():
+        """Test the Alternation-bender with raw arguments."""
+        assert Alternation("test").bend({}) == "test"
+        assert Alternation(S("test"), "default").bend({}) == "default"
 
 
 class TestSwitch:
@@ -71,3 +83,9 @@ class TestSwitch:
     def test__no_match_without_default(self):
         with pytest.raises(KeyError):
             Switch(S("key"), {}).bend({"key": None})
+
+    @staticmethod
+    def test_unbenderified_arguments():
+        """Test the Switch-bender with raw arguments."""
+        Switch("key", {"key": "value"}).bend({}) == "value"
+        Switch("key", {}, default="value").bend({}) == "value"

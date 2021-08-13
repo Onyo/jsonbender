@@ -1,4 +1,4 @@
-from jsonbender.core import Bender, K
+from jsonbender.core import Bender, K, benderify
 
 
 class If(Bender):
@@ -20,10 +20,10 @@ class If(Bender):
     ```
     """
 
-    def __init__(self, condition, when_true=K(None), when_false=K(None)):
-        self.condition = condition
-        self.when_true = when_true
-        self.when_false = when_false
+    def __init__(self, condition, when_true=None, when_false=None):
+        self.condition = benderify(condition)
+        self.when_true = benderify(when_true)
+        self.when_false = benderify(when_false)
 
     def bend(self, val):
         return self.when_true.bend(val) if self.condition.bend(val) else self.when_false.bend(val)
@@ -47,7 +47,7 @@ class Alternation(Bender):
     """
 
     def __init__(self, *benders):
-        self.benders = benders
+        self.benders = [benderify(b) for b in benders]
 
     def bend(self, source):
         exc = ValueError()
@@ -85,20 +85,21 @@ class Switch(Bender):
        'email': 'email@whatever.com'})  #  -> 'email@whatever.com'
     ```
     """
+    class NoValue:
+        pass
 
-    def __init__(self, key_bender, cases, default=None):
-        self.key_bender = key_bender
-        self.cases = cases
-        self.default = default
+    def __init__(self, key_bender, cases, default=NoValue):
+        self.key_bender = benderify(key_bender)
+        self.cases = {k: benderify(v) for k, v in cases.items()}
+        self.default = benderify(default) if default is not self.NoValue else None
 
     def bend(self, source):
         key = self.key_bender.bend(source)
         try:
             bender = self.cases[key]
-        except LookupError:
-            if self.default:
-                bender = self.default
-            else:
+        except KeyError:
+            if self.default is None:
                 raise
+            bender = self.default
 
         return bender.bend(source)
