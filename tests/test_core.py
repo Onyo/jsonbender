@@ -3,7 +3,6 @@ import unittest
 
 from jsonbender import F, K, S
 from jsonbender.core import BendingException, bend
-from jsonbender.test import BenderTestMixin
 
 
 class TestBend(unittest.TestCase):
@@ -78,65 +77,65 @@ class TestBend(unittest.TestCase):
         self.assertDictEqual(bend(mapping, {}), {"a": "a const value", "b": 123})
 
 
-class TestOperators(unittest.TestCase, BenderTestMixin):
+class TestOperators(unittest.TestCase):
     def test_add(self):
-        self.assert_bender(K(5) + K(2), None, 7)
+        assert (K(5) + K(2)).bend(None) == 7
 
     def test_sub(self):
-        self.assert_bender(K(5) - K(2), None, 3)
+        assert (K(5) - K(2)).bend(None) == 3
 
     def test_mul(self):
-        self.assert_bender(K(5) * K(2), None, 10)
+        assert (K(5) * K(2)).bend(None) == 10
 
     def test_div(self):
-        self.assert_bender(K(4) / K(2), None, 2)
+        assert (K(4) / K(2)).bend(None) == 2
         self.assertAlmostEqual((K(5) / K(2)).bend(None), 2.5, 2)
 
     def test_neg(self):
-        self.assert_bender(-K(1), None, -1)
-        self.assert_bender(-K(-1), None, 1)
+        assert (-K(1)).bend(None) == -1
+        assert (-K(-1)).bend(None) == 1
 
     def test_eq(self):
-        self.assert_bender(K(42) == K(42), None, True)
-        self.assert_bender(K(42) == K(27), None, False)
+        assert (K(42) == K(42)).bend(None)
+        assert not (K(42) == K(27)).bend(None)
 
     def test_ne(self):
-        self.assert_bender(K(42) != K(42), None, False)
-        self.assert_bender(K(42) != K(27), None, True)
+        assert not (K(42) != K(42)).bend(None)
+        assert (K(42) != K(27)).bend(None)
 
     def test_and(self):
-        self.assert_bender(K(True) & K(True), None, True)
-        self.assert_bender(K(True) & K(False), None, False)
-        self.assert_bender(K(False) & K(True), None, False)
-        self.assert_bender(K(False) & K(False), None, False)
+        assert (K(True) & K(True)).bend(None)
+        assert not (K(True) & K(False)).bend(None)
+        assert not (K(False) & K(True)).bend(None)
+        assert not (K(False) & K(False)).bend(None)
 
     def test_or(self):
-        self.assert_bender(K(True) | K(True), None, True)
-        self.assert_bender(K(True) | K(False), None, True)
-        self.assert_bender(K(False) | K(True), None, True)
-        self.assert_bender(K(False) | K(False), None, False)
+        assert (K(True) | K(True)).bend(None)
+        assert (K(True) | K(False)).bend(None)
+        assert (K(False) | K(True)).bend(None)
+        assert not (K(False) | K(False)).bend(None)
 
     def test_invert(self):
-        self.assert_bender(~K(True), None, False)
-        self.assert_bender(~K(False), None, True)
+        assert not (~K(True)).bend(None)
+        assert (~K(False)).bend(None)
 
 
-class TestGetItem(unittest.TestCase, BenderTestMixin):
+class TestGetItem(unittest.TestCase):
     def test_getitem(self):
         bender = S("val")[2:8:2]
         val = list(range(10))
-        self.assert_bender(bender, {"val": val}, [2, 4, 6])
+        assert bender.bend({"val": val}) == [2, 4, 6]
 
 
-class TestDict(unittest.TestCase, BenderTestMixin):
+class TestDict(unittest.TestCase):
     def test_function_with_dict(self):
         filter_none = F(lambda d: {k: v for k, v in d.items() if v is not None})
         b = filter_none << {"a": K(1), "b": K(None), "c": False}
-        self.assert_bender(b, {}, {"a": 1, "c": False})
+        assert b.bend({}) == {"a": 1, "c": False}
 
 
-class TestList(unittest.TestCase, BenderTestMixin):
+class TestList(unittest.TestCase):
     def test_function_with_list(self):
         filter_none = F(lambda l: [v for v in l if v is not None])
         b = filter_none << [1, None, False]
-        self.assert_bender(b, {}, [1, False])
+        assert b.bend({}) == [1, False]
