@@ -7,9 +7,10 @@ class S(Bender):
     Example:
         S('a', 0, 'b').bend({'a': [{'b': 42}]}) -> 42
     """
+
     def __init__(self, *path):
         if not path:
-            raise ValueError('No path given')
+            raise ValueError("No path given")
         self._path = path
 
     def bend(self, source):
@@ -35,7 +36,7 @@ class OptionalS(S):
     """
 
     def __init__(self, *path, **kwargs):
-        self.default = kwargs.get('default')
+        self.default = kwargs.get("default")
         super(OptionalS, self).__init__(*path)
 
     def bend(self, source):
@@ -61,6 +62,7 @@ class F(Bender):
     K([{'id': 3}, {'id': 1}]) >> f  #  -> [{'id': 1}, {'id': 3}]
     ```
     """
+
     def __init__(self, func, *args, **kwargs):
         self._func = func
         self._args = args
@@ -74,10 +76,7 @@ class F(Bender):
         Return a ProtectedF with the same parameters and with the given
         `protect_against`.
         """
-        return ProtectedF(self._func,
-                          *self._args,
-                          protect_against=protect_against,
-                          **self._kwargs)
+        return ProtectedF(self._func, *self._args, protect_against=protect_against, **self._kwargs)
 
 
 class ProtectedF(F):
@@ -94,8 +93,9 @@ class ProtectedF(F):
     ```
 
     """
+
     def __init__(self, func, *args, **kwargs):
-        self._protect_against = kwargs.pop('protect_against', None)
+        self._protect_against = kwargs.pop("protect_against", None)
         super(ProtectedF, self).__init__(func, *args, **kwargs)
 
     def bend(self, value):
@@ -103,5 +103,3 @@ class ProtectedF(F):
             return value
         else:
             return super(ProtectedF, self).bend(value)
-
-

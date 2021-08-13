@@ -26,9 +26,7 @@ class If(Bender):
         self.when_false = when_false
 
     def bend(self, val):
-        return (self.when_true.bend(val)
-                if self.condition.bend(val)
-                else self.when_false.bend(val))
+        return self.when_true.bend(val) if self.condition.bend(val) else self.when_false.bend(val)
 
 
 class Alternation(Bender):
@@ -104,4 +102,3 @@ class Switch(Bender):
                 raise
 
         return bender.bend(source)
-

@@ -1,81 +1,81 @@
+import sys
 import unittest
 
-import sys
-
-from jsonbender import S, K, F
-from jsonbender.core import bend, BendingException
+from jsonbender import F, K, S
+from jsonbender.core import BendingException, bend
 from jsonbender.test import BenderTestMixin
 
 
 class TestBend(unittest.TestCase):
     def test_empty_mapping(self):
-        self.assertDictEqual(bend({}, {'a': 1}), {})
+        self.assertDictEqual(bend({}, {"a": 1}), {})
 
     def test_flat_mapping(self):
         mapping = {
-            'a_field': S('a', 'b'),
-            'another_field': K('wow'),
+            "a_field": S("a", "b"),
+            "another_field": K("wow"),
         }
-        source = {'a': {'b': 'ok'}}
+        source = {"a": {"b": "ok"}}
         expected = {
-            'a_field': 'ok',
-            'another_field': 'wow',
+            "a_field": "ok",
+            "another_field": "wow",
         }
         self.assertDictEqual(bend(mapping, source), expected)
 
     def test_nested_mapping(self):
         mapping = {
-            'a_field': S('a', 'b'),
-            'a': {
-                'nested': {
-                    'field': S('f1', 'f2'),
+            "a_field": S("a", "b"),
+            "a": {
+                "nested": {
+                    "field": S("f1", "f2"),
                 },
             },
         }
         source = {
-            'a': {'b': 'ok'},
-            'f1': {'f2': 'hi'},
+            "a": {"b": "ok"},
+            "f1": {"f2": "hi"},
         }
         expected = {
-            'a_field': 'ok',
-            'a': {'nested': {'field': 'hi'}},
+            "a_field": "ok",
+            "a": {"nested": {"field": "hi"}},
         }
         self.assertDictEqual(bend(mapping, source), expected)
 
     def test_nested_mapping_with_lists(self):
         mapping = {
-            'a_field': S('a', 'b'),
-            'a': [{
-                'nested': {
-                    'field': S('f1', 'f2'),
-                },
-            }],
+            "a_field": S("a", "b"),
+            "a": [
+                {
+                    "nested": {
+                        "field": S("f1", "f2"),
+                    },
+                }
+            ],
         }
         source = {
-            'a': {'b': 'ok'},
-            'f1': {'f2': 'hi'},
+            "a": {"b": "ok"},
+            "f1": {"f2": "hi"},
         }
         expected = {
-            'a_field': 'ok',
-            'a': [{'nested': {'field': 'hi'}}],
+            "a_field": "ok",
+            "a": [{"nested": {"field": "hi"}}],
         }
         self.assertDictEqual(bend(mapping, source), expected)
 
     def test_list_with_non_dict_elements(self):
-        mapping = {'k': ['foo1', S('bar1')]}
-        source = {'bar1': 'val 1'}
-        expected = {'k': ['foo1', 'val 1']}
+        mapping = {"k": ["foo1", S("bar1")]}
+        source = {"bar1": "val 1"}
+        expected = {"k": ["foo1", "val 1"]}
         self.assertDictEqual(bend(mapping, source), expected)
 
     def test_bending_exception_is_raised_when_something_bad_happens(self):
-        mapping = {'a': S('nonexistant')}
+        mapping = {"a": S("nonexistant")}
         source = {}
         self.assertRaises(BendingException, bend, mapping, source)
 
     def test_constants_without_K(self):
-        mapping = {'a': 'a const value', 'b': 123}
-        self.assertDictEqual(bend(mapping, {}),
-                             {'a': 'a const value', 'b': 123})
+        mapping = {"a": "a const value", "b": 123}
+        self.assertDictEqual(bend(mapping, {}), {"a": "a const value", "b": 123})
 
 
 class TestOperators(unittest.TestCase, BenderTestMixin):
@@ -123,19 +123,19 @@ class TestOperators(unittest.TestCase, BenderTestMixin):
 
 class TestGetItem(unittest.TestCase, BenderTestMixin):
     def test_getitem(self):
-        bender = S('val')[2:8:2]
+        bender = S("val")[2:8:2]
         if sys.version_info.major == 2:
             val = range(10)
         else:
             val = list(range(10))
-        self.assert_bender(bender, {'val': val}, [2, 4, 6])
+        self.assert_bender(bender, {"val": val}, [2, 4, 6])
 
 
 class TestDict(unittest.TestCase, BenderTestMixin):
     def test_function_with_dict(self):
         filter_none = F(lambda d: {k: v for k, v in d.items() if v is not None})
-        b = filter_none << {'a': K(1), 'b': K(None), 'c': False}
-        self.assert_bender(b, {}, {'a': 1, 'c': False})
+        b = filter_none << {"a": K(1), "b": K(None), "c": False}
+        self.assert_bender(b, {}, {"a": 1, "c": False})
 
 
 class TestList(unittest.TestCase, BenderTestMixin):
@@ -145,5 +145,5 @@ class TestList(unittest.TestCase, BenderTestMixin):
         self.assert_bender(b, {}, [1, False])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

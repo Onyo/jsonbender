@@ -67,6 +67,7 @@ class K(Bender):
     """
     Selects a constant value.
     """
+
     def __init__(self, value):
         self._val = value
 
@@ -96,7 +97,7 @@ class Dict(Bender):
             try:
                 res[k] = v.bend(source)
             except Exception as e:
-                m = 'Error for key {}: {}'.format(k, str(e))
+                m = "Error for key {}: {}".format(k, str(e))
                 raise BendingException(m)
         return res
 
@@ -170,8 +171,7 @@ class BinaryOperator(Bender):
         raise NotImplementedError()
 
     def bend(self, source):
-        return self.op(self._bender1.bend(source),
-                       self._bender2.bend(source))
+        return self.op(self._bender1.bend(source), self._bender2.bend(source))
 
 
 class Add(BinaryOperator):
