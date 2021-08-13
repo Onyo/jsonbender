@@ -70,7 +70,3 @@ class TestSwitch(BenderTestMixin, unittest.TestCase):
 
     def test__no_match_without_default(self):
         self.assertRaises(KeyError, Switch(S("key"), {}).bend, {"key": None})
-
-
-if __name__ == "__main__":
-    unittest.main()

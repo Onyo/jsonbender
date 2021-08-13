@@ -87,7 +87,3 @@ class TestFlatForall(ListOpTestCase):
         # TODO: remove this on next release
         bender = self.cls(K([1]), lambda i: [i])
         self.assert_bender(bender, {}, [1])
-
-
-if __name__ == "__main__":
-    unittest.main()

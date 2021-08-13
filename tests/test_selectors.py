@@ -89,7 +89,3 @@ class TestProtectedF(unittest.TestCase, FTestsMixin):
         protected = ProtectedF(int)
         self.assert_bender(protected, "123", 123)
         self.assert_bender(protected, None, None)
-
-
-if __name__ == "__main__":
-    unittest.main()

@@ -22,7 +22,3 @@ class TestProtectedFormat(unittest.TestCase):
         )
         assert bender.bend({}) is None
         assert bender.bend({"noun": "test"}) == "This is a test."
-
-
-if __name__ == "__main__":
-    unittest.main()

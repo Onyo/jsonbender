@@ -124,10 +124,7 @@ class TestOperators(unittest.TestCase, BenderTestMixin):
 class TestGetItem(unittest.TestCase, BenderTestMixin):
     def test_getitem(self):
         bender = S("val")[2:8:2]
-        if sys.version_info.major == 2:
-            val = range(10)
-        else:
-            val = list(range(10))
+        val = list(range(10))
         self.assert_bender(bender, {"val": val}, [2, 4, 6])
 
 
@@ -143,7 +140,3 @@ class TestList(unittest.TestCase, BenderTestMixin):
         filter_none = F(lambda l: [v for v in l if v is not None])
         b = filter_none << [1, None, False]
         self.assert_bender(b, {}, [1, False])
-
-
-if __name__ == "__main__":
-    unittest.main()

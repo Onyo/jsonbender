@@ -188,7 +188,7 @@ The bitwise operators are not yet implemented, except for the lshift (`<<`) and 
 See "Composition" below.
 
 
-#### List ops 
+#### List ops
 
 There are 4 benders for working with lists, inspired by the common functional programming operations.
 
@@ -428,4 +428,3 @@ ret = bend(MAPPING, {
 })
 assert ret == {'name': 'Mary', 'age': 26}
 ```
-
