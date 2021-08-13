@@ -1,14 +1,12 @@
-import unittest
-from operator import add
+import pytest
 
-from jsonbender import K, S, bend
+from jsonbender import K, S
 from jsonbender.control_flow import Alternation, If, Switch
 
 
-class TestIf(unittest.TestCase):
-    def setUp(self):
-        self.na_li = {"country": "China", "first_name": "Li", "last_name": "Na"}
-        self.guga = {"country": "Brazil", "first_name": "Gustavo", "last_name": "Kuerten"}
+class TestIf:
+    na_li = {"country": "China", "first_name": "Li", "last_name": "Na"}
+    guga = {"country": "Brazil", "first_name": "Gustavo", "last_name": "Kuerten"}
 
     def test_if_true(self):
         if_ = If(S("country") == K("China"), S("first_name"), S("last_name"))
@@ -27,9 +25,10 @@ class TestIf(unittest.TestCase):
         assert if_.bend(self.guga) is None
 
 
-class TestAlternation(unittest.TestCase):
+class TestAlternation:
     def test_empty_benders(self):
-        self.assertRaises(ValueError, Alternation().bend, {})
+        with pytest.raises(ValueError):
+            Alternation().bend({})
 
     def test_matches(self):
         bender = Alternation(S(1), S(0), S("key1"))
@@ -38,11 +37,13 @@ class TestAlternation(unittest.TestCase):
         assert bender.bend({"key1": 23}) == 23
 
     def test_no_match(self):
-        self.assertRaises(IndexError, Alternation(S(1)).bend, [])
-        self.assertRaises(KeyError, Alternation(S(1)).bend, {})
+        with pytest.raises(IndexError):
+            Alternation(S(1)).bend([])
+        with pytest.raises(KeyError):
+            Alternation(S(1)).bend({})
 
 
-class TestSwitch(unittest.TestCase):
+class TestSwitch:
     def test_match(self):
         bender = Switch(
             S("service"),
@@ -68,4 +69,5 @@ class TestSwitch(unittest.TestCase):
         )
 
     def test__no_match_without_default(self):
-        self.assertRaises(KeyError, Switch(S("key"), {}).bend, {"key": None})
+        with pytest.raises(KeyError):
+            Switch(S("key"), {}).bend({"key": None})

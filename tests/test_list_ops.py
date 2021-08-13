@@ -1,11 +1,12 @@
-import unittest
 from operator import add
 
-from jsonbender import K, S, bend
+import pytest
+
+from jsonbender import K, S
 from jsonbender.list_ops import Filter, FlatForall, Forall, ForallBend, ListOp, Reduce
 
 
-class ListOpTestCase(unittest.TestCase):
+class ListOpTestCase:
     cls = ListOp
 
     def assert_list_op(self, the_list, func, expected_value):
@@ -37,9 +38,11 @@ class TestForallBend(ListOpTestCase):
 class TestReduce(ListOpTestCase):
     cls = Reduce
 
-    def test_empty_list(self):
+    @staticmethod
+    def test_empty_list():
         bender = Reduce(add)
-        self.assertRaises(ValueError, bender.bend, [])
+        with pytest.raises(ValueError):
+            bender.bend([])
 
     def test_nonempty_list(self):
         self.assert_list_op(range(1, 5), add, 10)
