@@ -25,8 +25,12 @@ class If(Bender):
         self.when_true = benderify(when_true)
         self.when_false = benderify(when_false)
 
-    def bend(self, val):
-        return self.when_true.bend(val) if self.condition.bend(val) else self.when_false.bend(val)
+    def bend(self, source):
+        return (
+            self.when_true.bend(source)
+            if self.condition.bend(source)
+            else self.when_false.bend(source)
+        )
 
 
 class Alternation(Bender):
@@ -85,6 +89,7 @@ class Switch(Bender):
        'email': 'email@whatever.com'})  #  -> 'email@whatever.com'
     ```
     """
+
     class NoValue:
         pass
 

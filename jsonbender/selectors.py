@@ -68,8 +68,8 @@ class F(Bender):
         self._args = args
         self._kwargs = kwargs
 
-    def bend(self, value):
-        return self._func(value, *self._args, **self._kwargs)
+    def bend(self, source):
+        return self._func(source, *self._args, **self._kwargs)
 
     def protect(self, protect_against=None):
         """
@@ -98,7 +98,7 @@ class ProtectedF(F):
         self._protect_against = kwargs.pop("protect_against", None)
         super().__init__(func, *args, **kwargs)
 
-    def bend(self, value):
-        if value == self._protect_against:
-            return value
-        return super().bend(value)
+    def bend(self, source):
+        if source == self._protect_against:
+            return source
+        return super().bend(source)
