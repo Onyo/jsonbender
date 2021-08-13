@@ -1,0 +1,37 @@
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.0.1
+    hooks:
+    -   id: trailing-whitespace
+    -   id: end-of-file-fixer
+    -   id: debug-statements
+    -   id: check-added-large-files
+-   repo: local
+    hooks:
+    -   id: safety
+        name: safety
+        entry: safety check -r
+        language: system
+        files: requirements.txt
+    -   id: isort
+        name: isort
+        entry: isort
+        language: system
+        types:
+        - python
+    -   id: black
+        name: black
+        entry: black
+        language: system
+        files: \.py$
+    -   id: pylint
+        name: pylint
+        entry: pylint --jobs=2
+        language: system
+        types:
+        - python
+    -   id: pydocstyle
+        name: pydocstyle
+        entry: pydocstyle
+        language: python
+        files: \.py$

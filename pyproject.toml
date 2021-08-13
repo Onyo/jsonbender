@@ -1,0 +1,20 @@
+[tool.black]
+line-length = 100
+
+[tool.isort]
+profile = "black"
+line_length = 100
+combine_as_imports = true
+
+[tool.pylint.messages_control]
+disable = "C0330, C0326"
+
+[tool.pylint.format]
+max-line-length = "100"
+
+[tool.pytest.ini_options]
+addopts = "--cov=jsonbender --cov-report=term"
+python_classes = [
+  "*Test",
+  "Test*",
+]
