@@ -1,3 +1,4 @@
+from jsonbender.control_flow import Alternation
 from jsonbender.core import Bender, Protected
 
 
@@ -19,33 +20,13 @@ class S(Bender):
         return source
 
     def optional(self, default=None):
-        """
-        Return an OptionalS with the same path and with the given `default`.
-        """
-        return OptionalS(*self._path, default=default)
+        """Return a selector with the same meaning and a default value."""
+        return Alternation(self, default)
 
 
-class OptionalS(S):
-    """
-    Similar to S. However, if any of the keys doesn't exist, returns the
-    `default` value.
-
-    `default` defaults to None.
-    Example:
-        OptionalS('a', 0, 'b', default=23).bend({'a': []}) -> 23
-    """
-
-    def __init__(self, *path, **kwargs):
-        self.default = kwargs.get("default")
-        super().__init__(*path)
-
-    def bend(self, source):
-        try:
-            ret = super().bend(source)
-        except LookupError:
-            return self.default
-        else:
-            return ret
+def OptionalS(*path, default=None):
+    """Backward compatibilty wrapper for S().optional()."""
+    return Alternation(S(*path), default)
 
 
 class F(Bender):

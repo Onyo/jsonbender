@@ -40,7 +40,10 @@ class TestS(STestsMixin):
 
 
 class TestOptionalS(STestsMixin):
-    selector_cls = OptionalS
+    @staticmethod
+    def selector_cls(*args, **kwargs):
+        """Wrap OptionalS into a staticmethod so it’s turned into a bound method."""
+        return OptionalS(*args, **kwargs)
 
     @staticmethod
     def test_opts_without_default():
