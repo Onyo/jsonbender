@@ -31,6 +31,11 @@ class TestIf(BenderTestMixin, unittest.TestCase):
         if_ = If(S('country') == K('China'), S('first_name'))
         self.assert_bender(if_, self.guga, None)
 
+    def test_if_context(self):
+        ctx = { 'key': True }
+        if_ = If((Context() >> S('key')), S('first_name'))
+        self.assert_bender(if_, self.na_li, 'Li', context=ctx)
+
 
 class TestAlternation(BenderTestMixin, unittest.TestCase):
     def test_empty_benders(self):

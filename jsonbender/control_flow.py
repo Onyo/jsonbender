@@ -1,4 +1,4 @@
-from jsonbender.core import Bender
+from jsonbender.core import Bender, Transport
 from jsonbender.selectors import K
 
 
@@ -26,10 +26,14 @@ class If(Bender):
         self.when_true = when_true
         self.when_false = when_false
 
-    def execute(self, val):
-        return (self.when_true(val)
-                if self.condition(val)
-                else self.when_false(val))
+    def raw_execute(self, source):
+        transport = Transport.from_source(source)
+        res = (
+            self.when_true(transport)
+            if self.condition(transport)
+            else self.when_false(transport)
+        )
+        return Transport(res, transport.context)
 
 
 class Alternation(Bender):
@@ -52,15 +56,17 @@ class Alternation(Bender):
     def __init__(self, *benders):
         self.benders = benders
 
-    def execute(self, source):
+    def raw_execute(self, source):
+        transport = Transport.from_source(source)
+
         exc = ValueError()
         for bender in self.benders:
             try:
-                result = bender(source)
+                result = bender(transport)
             except LookupError as e:
                 exc = e
             else:
-                return result
+                return Transport(result, transport.context)
         else:
             raise exc
 
@@ -94,7 +100,8 @@ class Switch(Bender):
         self.cases = cases
         self.default = default
 
-    def execute(self, source):
+    def raw_execute(self, source):
+        transport = Transport.from_source(source)
         key = self.key_bender(source)
         try:
             bender = self.cases[key]
@@ -104,5 +111,5 @@ class Switch(Bender):
             else:
                 raise
 
-        return bender(source)
-
+        res = bender(source)
+        return Transport(res, transport.context)
